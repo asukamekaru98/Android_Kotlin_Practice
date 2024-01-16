@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ViewSample2</string>
+    <string name="tv_msg">名前を入力して</string>
+</resources>
