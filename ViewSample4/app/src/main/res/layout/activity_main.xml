@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#A1A9BA"
@@ -16,7 +17,20 @@
         android:text="@string/tv_msg"
         android:textSize="25sp"/>
 
+    <EditText
+        android:id = "@+id/etInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:layout_marginTop="5dp"
+        android:background="#ffffff"
+        android:inputType="phone"
+        android:importantForAutofill="no"
+        tools:ignore="LabelFor" />
+
 </LinearLayout>
+
+
 
 <!--
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
