@@ -25,6 +25,12 @@
         android:layout_height="wrap_content"
         android:text="@string/bt_click"/>
 
+    <Button
+        android:id="@+id/btClear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bt_clear"/>
+
     <TextView
         android:id="@+id/tvOutput"
         android:layout_width="match_parent"
