@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         override fun onItemClick(parent: AdapterView<*>, view: View, position:Int, id: Long) {
             val item = parent.getItemAtPosition(position) as String
             val show = "あなたが選んだ定食："+item
+            //Toast.makeText(this@MainActivity,show,Toast.LENGTH_LONG).show()
             Toast.makeText(this@MainActivity,show,Toast.LENGTH_LONG).show()
         }
     }
