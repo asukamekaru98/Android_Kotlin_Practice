@@ -3,12 +3,14 @@ package com.websarva.wings.android.menusample
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         val adapter = SimpleAdapter(this@MainActivity, _menuList, R.layout.row, _from, _to)
         lvMenu.adapter = adapter
         lvMenu.onItemClickListener = ListItemClickListener()
+
+        registerForContextMenu(lvMenu)
     }
 
      private fun createTeishokuList(): MutableList<MutableMap<String, Any>>{
@@ -57,7 +61,9 @@ class MainActivity : AppCompatActivity() {
          override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long) {
              val item = parent.getItemAtPosition(position) as MutableMap<String, Any>
 
-             val menuName = item["name"] as String
+             order(item)
+
+           /*  val menuName = item["name"] as String
              val menuPrice = item["price"] as Int
 
              val intent2MenuThanks = Intent(this@MainActivity, MenuThanksActivity::class.java)
@@ -65,29 +71,63 @@ class MainActivity : AppCompatActivity() {
              intent2MenuThanks.putExtra("menuName", menuName)
              intent2MenuThanks.putExtra("menuPrice", "${menuPrice}円")
 
-             startActivity(intent2MenuThanks)
+             startActivity(intent2MenuThanks)*/
 
          }
      }
+
+    private fun order(menu: MutableMap<String, Any>){
+        val menuName = menu["name"] as String
+        val menuPrice = menu["price"] as Int
+
+        val intent2MenuThanks = Intent(this@MainActivity,MenuThanksActivity::class.java)
+        intent2MenuThanks.putExtra("menuName",menuName)
+        intent2MenuThanks.putExtra("menuPrice","${menuPrice}円")
+        startActivity(intent2MenuThanks)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_options_menu_list, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean{
+    override fun onContextItemSelected(item: MenuItem): Boolean {
         var returnVal = true
-        when(item.itemId){
-            R.id.menuListOptionTeishoku ->
-                _menuList = createTeishokuList()
-            R.id.menuListOptionCurry ->
-                _menuList = createCurryList()
+        val info = item.menuInfo as AdapterView.AdapterContextMenuInfo
+        val listPosition = info.position
+        val menu = _menuList[listPosition]
+
+        when (item.itemId) {
+            R.id.menuListContextDesc -> {
+                val desc = menu["desc"] as String
+                Toast.makeText(this@MainActivity, desc, Toast.LENGTH_LONG).show()
+            }
+
+            R.id.menuListContextOrder ->
+                order(menu)
+
             else ->
-                returnVal = super.onOptionsItemSelected(item)
+                returnVal = super.onContextItemSelected(item)
         }
-        val lvMenu = findViewById<ListView>(R.id.lvMenu)
-        val adapter = SimpleAdapter(this@MainActivity,_menuList,R.layout.row, _from, _to)
-        lvMenu.adapter = adapter
         return returnVal
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var returnVal = true
+
+        if(item.itemId == android.R.id.home){
+            finish()
+        }else{
+            returnVal = super.onOptionsItemSelected(item)
+        }
+
+        return returnVal
+    }
+
+    override fun onCreateContextMenu(menu:ContextMenu,view: View,menuInfo:ContextMenu.ContextMenuInfo){
+        super.onCreateContextMenu(menu, view, menuInfo)
+        menuInflater.inflate(R.menu.menu_context_menu_list,menu)
+        menu.setHeaderTitle(R.string.menu_list_header)
     }
 }
