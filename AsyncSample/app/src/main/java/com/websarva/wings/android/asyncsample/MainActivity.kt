@@ -2,10 +2,16 @@ package com.websarva.wings.android.asyncsample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
+import androidx.core.os.HandlerCompat
+import java.lang.reflect.Executable
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,8 +58,32 @@ class MainActivity : AppCompatActivity() {
         return list
     }
 
+    @UiThread
     private fun receiveWeatherInfo(urlFull: String){
+        val handler = HandlerCompat.createAsync(mainLooper)
+        val backgroundReceiver = WeatherInfoBackgroundReceiver()
+        val executeServer = Executors.newSingleThreadExecutor()
+        executeServer.submit(backgroundReceiver)
+    }
 
+    private inner class WeatherInfoBackgroundReceiver(handler: Handler,url:String): Runnable{
+
+        private val _handler = handler
+        private val _url = url
+
+        @WorkerThread
+        override fun run(){
+            val postExecutor = WeatherInfoPostExecuter()
+            _handler.post(postExecutor)
+        }
+    }
+
+    private inner class WeatherInfoPostExecuter(): Runnable{
+
+        @UiThread
+        override fun run(){
+
+        }
     }
 
     private inner class ListItemClickListener: AdapterView.OnItemClickListener{
