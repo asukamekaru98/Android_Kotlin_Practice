@@ -116,12 +116,18 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         var returnVal = true
 
-        if(item.itemId == android.R.id.home){
-            finish()
-        }else{
-            returnVal = super.onOptionsItemSelected(item)
+        when(item.itemId){
+            R.id.menuListOptionTeishoku ->
+                _menuList = createTeishokuList()
+            R.id.menuListOptionCurry ->
+                _menuList = createCurryList()
+            else->
+                returnVal = super.onOptionsItemSelected(item)
         }
 
+        val lvMenu = findViewById<ListView>(R.id.lvMenu)
+        val adapter = SimpleAdapter(this@MainActivity, _menuList, R.layout.row, _from, _to)
+        lvMenu.adapter = adapter
         return returnVal
     }
 
