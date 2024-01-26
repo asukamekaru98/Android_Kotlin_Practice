@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">DatabaseSample</string>
+    <string-array name="lv_cocktaillist">
+        <item>ホワイトレディー</item>
+        <item>ブラックレディー</item>
+        <item>イエローレディー</item>
+        <item>ピンクレディー</item>
+        <item>パープルレディー</item>
+        <item>ブルーレディー</item>
+        <item>グリーンレディー</item>
+        <item>レッドレディー</item>
+        <item>レインボーレディー</item>
+    </string-array>
+    <string name="tv_lb_name">選択されたカクテル：</string>
+    <string name="tv_name">未選択</string>
+    <string name="tv_lb_none">感想：</string>
+    <string name="btn_save">保存</string>
+
+</resources>
