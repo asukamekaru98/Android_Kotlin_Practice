@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val DEBUG_TAG = "AsyncSample"
-        private const val WEATHERINFO_URL = "http://api.openweathermap.org/data/2.5/weather?lang=jp"
+        private const val WEATHERINFO_URL = "https://api.openweathermap.org/data/2.5/weather?lang=ja"
         private const val APP_ID = "a4e2725b01eb29e04e727a1c8ced94f1"
     }
 
@@ -163,8 +163,8 @@ class MainActivity : AppCompatActivity() {
             val coordJSON = rootJSON.getJSONObject("coord")
             val latitude = coordJSON.getString("lat")
             val longitude = coordJSON.getString("lon")
-            val weatherJSONArray = rootJSON.getJSONObject("weather")
-            val weatherJSON = weatherJSONArray.getJSONObject("0")
+            val weatherJSONArray = rootJSON.getJSONArray("weather")
+            val weatherJSON = weatherJSONArray.getJSONObject(0)
             val weather = weatherJSON.getString("description")
             val telop = "${cityName}の天気"
             val desc = "現在は${weather}です。\n経度は${latitude}度で経度は${longitude}度です"
