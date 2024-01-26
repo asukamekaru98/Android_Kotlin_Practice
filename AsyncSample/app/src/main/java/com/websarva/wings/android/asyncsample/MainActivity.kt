@@ -3,6 +3,7 @@ package com.websarva.wings.android.asyncsample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
@@ -10,7 +11,14 @@ import android.widget.SimpleAdapter
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.lang.StringBuilder
 import java.lang.reflect.Executable
+import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.URL
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -61,7 +69,7 @@ class MainActivity : AppCompatActivity() {
     @UiThread
     private fun receiveWeatherInfo(urlFull: String){
         val handler = HandlerCompat.createAsync(mainLooper)
-        val backgroundReceiver = WeatherInfoBackgroundReceiver()
+        val backgroundReceiver = WeatherInfoBackgroundReceiver(handler, urlFull)
         val executeServer = Executors.newSingleThreadExecutor()
         executeServer.submit(backgroundReceiver)
     }
@@ -73,17 +81,52 @@ class MainActivity : AppCompatActivity() {
 
         @WorkerThread
         override fun run(){
+            var result = ""
+            val url = URL(_url)
+            val con = url.openConnection() as? HttpURLConnection
+
+            con?.let {
+                try {
+                    it.connectTimeout = 1000
+                    it.readTimeout = 1000
+                    it.requestMethod = "GET"
+                    it.connect()
+
+                    val stream = it.inputStream
+                    result = is2String(stream)
+                    stream.close()
+                } catch (ex: SocketTimeoutException) {
+                    Log.w(DEBUG_TAG, "通信タイムアウト", ex)
+                }
+                it.disconnect()
+            }
+
             val postExecutor = WeatherInfoPostExecuter()
             _handler.post(postExecutor)
+        }
+
+        private fun is2String(stream: InputStream): String{
+            val sb = StringBuilder()
+            val reader = BufferedReader(InputStreamReader(stream, "UTF-8"))
+            var line = reader.readLine()
+            while(line != null){
+                sb.append(line)
+                line = reader.readLine()
+            }
+            reader.close()
+            return sb.toString()
         }
     }
 
     private inner class WeatherInfoPostExecuter(): Runnable{
 
         @UiThread
-        override fun run(){
+        //インターネットの世界へGO!!!!!!!!!!!!
+        override fun run() {
 
         }
+
+
     }
 
     private inner class ListItemClickListener: AdapterView.OnItemClickListener{
