@@ -13,6 +13,8 @@ import android.widget.TextView
 
 class MenuListFragment : Fragment() {
 
+    private var _isLayoutXLarge = true
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_menu_list, container, false)
@@ -40,24 +42,38 @@ class MenuListFragment : Fragment() {
         return view
     }
 
-    private inner class ListItemClickListener : AdapterView.OnItemClickListener {
-        override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-            // タップされた行のデータを取得。SimpleAdapterでは1行分のデータはMutableMap型!
-            val item = parent.getItemAtPosition(position) as MutableMap<String, String>
-            // 定食名と金額を取得。
-            val menuName = item["name"]
-            val menuPrice = item["price"]
-            // インテントオブジェクトを生成。
-            val intent2MenuThanks = Intent(activity, MenuThanksActivity::class.java)
-            // 第2画面に送るデータを格納。
-            intent2MenuThanks.putExtra("menuName", menuName)
-            intent2MenuThanks.putExtra("menuPrice", menuPrice)
-//			val intent2MenuThanks = Intent(this@MainActivity, MenuThanksActivity::class.java).apply {
-//				putExtra("menuName", menuName)
-//				putExtra("menuPrice", menuPrice)
-//			}
-            // 第2画面の起動。
-            startActivity(intent2MenuThanks)
+    override fun onActivityCreated(savedInstanceState: Bundle?){
+        super.onActivityCreated(savedInstanceState)
+        val menuThanksFragment = activity?.findViewById<View>(R.id.menuThanksFrame)
+        if(menuThanksFragment == null){
+            _isLayoutXLarge = false
         }
     }
+
+    private inner class ListItemClickListener : AdapterView.OnItemClickListener {
+        override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+
+            val item = parent.getItemAtPosition(position) as MutableMap<String, String>
+            val menuName = item["name"]
+            val menuPrice = item["price"]
+
+            val bundle = Bundle()
+            bundle.putString("menuName", menuName)
+            bundle.putString("menuPrice", menuPrice)
+
+            if(_isLayoutXLarge) {
+                val transaction = fragmentManager?.beginTransaction()
+                val menuThanksFragment = MenuThanksFragment()
+                menuThanksFragment.arguments = bundle
+                transaction?.replace(R.id.menuThanksFrame, menuThanksFragment)
+                transaction?.commit()
+            }
+            else {
+                val intent2MenuThanks = Intent(activity, MenuThanksActivity::class.java)
+                intent2MenuThanks.putExtras(bundle)
+                startActivity(intent2MenuThanks)
+            }
+        }
+    }
+
 }

@@ -34,6 +34,7 @@ class MenuThanksFragment : Fragment() {
 
         val menuName = extras?.getString("menuName")
         val menuPrice = extras?.getString("menuPrice")
+
         val tvMenuName = view.findViewById<TextView>(R.id.tvMenuName)
         val tvMenuPrice = view.findViewById<TextView>(R.id.tvMenuPrice)
 
