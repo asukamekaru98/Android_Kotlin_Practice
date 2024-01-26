@@ -8,9 +8,11 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.TextView
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.os.HandlerCompat
+import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -25,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val DEBUG_TAG = "AsyncSample"
-        private const val WEATHERINFO_URL = "http://api.openweathermap.org/data/2.5/weather?lang=ja"
+        private const val WEATHERINFO_URL = "http://api.openweathermap.org/data/2.5/weather?lang=jp"
         private const val APP_ID = "a4e2725b01eb29e04e727a1c8ced94f1"
     }
 
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         _list = createList()
+
+        Log.d("MainActivity", "mogumogu")
 
         val lvCityList = findViewById<ListView>(R.id.lvCityList)
         val from = arrayOf("name")
@@ -62,16 +66,23 @@ class MainActivity : AppCompatActivity() {
 
         city = mutableMapOf("name" to "新潟","q" to "Niigata")
         list.add(city)
-
+        Log.d("MainActivity", "piyopiyo")
         return list
     }
 
     @UiThread
     private fun receiveWeatherInfo(urlFull: String){
+
+        Log.d("MainActivity", "うみゃみゃ")
+
         val handler = HandlerCompat.createAsync(mainLooper)
+        Log.d("MainActivity", "1")
         val backgroundReceiver = WeatherInfoBackgroundReceiver(handler, urlFull)
+        Log.d("MainActivity", "2")
         val executeServer = Executors.newSingleThreadExecutor()
+        Log.d("MainActivity", "3")
         executeServer.submit(backgroundReceiver)
+        Log.d("MainActivity", "4")
     }
 
     private inner class WeatherInfoBackgroundReceiver(handler: Handler,url:String): Runnable{
@@ -85,23 +96,44 @@ class MainActivity : AppCompatActivity() {
             val url = URL(_url)
             val con = url.openConnection() as? HttpURLConnection
 
+            Log.d("MainActivity", _url)
+            if(con == null){
+                Log.d("MainActivity", "con is null")
+            }else{
+                Log.d("MainActivity", "con isnot null")
+            }
+
+
+
+
             con?.let {
+                Log.d("MainActivity", "入った")
                 try {
+                    Log.d("MainActivity", "try 入った")
+
                     it.connectTimeout = 1000
                     it.readTimeout = 1000
                     it.requestMethod = "GET"
+
+                    Log.d("MainActivity", "connect前")
                     it.connect()
 
+                    Log.d("MainActivity", "6")
                     val stream = it.inputStream
+                    Log.d("MainActivity", "7")
                     result = is2String(stream)
+                    Log.d("MainActivity", "8")
                     stream.close()
+                    Log.d("MainActivity", "9")
+
                 } catch (ex: SocketTimeoutException) {
-                    Log.w(DEBUG_TAG, "通信タイムアウト", ex)
+                    Log.w("MainActivity", "通信タイムアウト", ex)
                 }
+                Log.d("MainActivity", "10")
                 it.disconnect()
             }
-
-            val postExecutor = WeatherInfoPostExecuter()
+            Log.d("MainActivity", "うびゃびゃ")
+            val postExecutor = WeatherInfoPostExecuter(result)
             _handler.post(postExecutor)
         }
 
@@ -118,15 +150,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private inner class WeatherInfoPostExecuter(): Runnable{
+    private inner class WeatherInfoPostExecuter(result: String): Runnable{
+
+        private val _result = result
 
         @UiThread
         //インターネットの世界へGO!!!!!!!!!!!!
         override fun run() {
+            Log.d("MainActivity", "hoge")
+            val rootJSON = JSONObject(_result)
+            val cityName = rootJSON.getString("name")
+            val coordJSON = rootJSON.getJSONObject("coord")
+            val latitude = coordJSON.getString("lat")
+            val longitude = coordJSON.getString("lon")
+            val weatherJSONArray = rootJSON.getJSONObject("weather")
+            val weatherJSON = weatherJSONArray.getJSONObject("0")
+            val weather = weatherJSON.getString("description")
+            val telop = "${cityName}の天気"
+            val desc = "現在は${weather}です。\n経度は${latitude}度で経度は${longitude}度です"
+            val tvWeatherTelop = findViewById<TextView>(R.id.tvWeatherTelop)
+            val tvWeatherDesc = findViewById<TextView>(R.id.tvWeatherDesc)
 
+            tvWeatherTelop.text = telop
+            tvWeatherDesc.text = desc
         }
-
-
     }
 
     private inner class ListItemClickListener: AdapterView.OnItemClickListener{
