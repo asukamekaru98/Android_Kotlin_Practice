@@ -3,6 +3,7 @@ package com.websarva.wings.android.servicesample
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.media.MediaPlayer
@@ -32,6 +33,8 @@ class SoundManageSevice : Service() {
         val channel = NotificationChannel(CHANNEL_ID, name, importance)
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
+
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -61,6 +64,17 @@ class SoundManageSevice : Service() {
     private inner class PlayerPreparedListener : MediaPlayer.OnPreparedListener{
         override fun onPrepared(mp: MediaPlayer) {
             mp.start()
+            val builder = NotificationCompat.Builder(this@SoundManageSevice, CHANNEL_ID)
+            builder.setSmallIcon(android.R.drawable.ic_dialog_info)
+            builder.setContentTitle(getString(R.string.msg_notification_title_start))
+            builder.setContentText(getString(R.string.msg_notification_text_start))
+            val intent = Intent(this@SoundManageSevice,MainActivity::class.java)
+            intent.putExtra("formNotification",true)
+            val stopServiceIntent = PendingIntent.getActivity(this@SoundManageSevice,0,intent,PendingIntent.FLAG_CANCEL_CURRENT)
+            builder.setContentIntent(stopServiceIntent)
+            builder.setAutoCancel(true)
+            val notification = builder.build()
+            startForeground(200, notification);
         }
     }
 
