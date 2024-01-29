@@ -7,10 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +35,9 @@ class MainActivity : AppCompatActivity() {
         val menuList = createTeishokuList()
         val adapter = RecyclerListAdapter(menuList)
         lvMenu.adapter = adapter
+
+        val decorator = DividerItemDecoration(this@MainActivity,layout.orientation)
+        lvMenu.addItemDecoration(decorator)
     }
 
     private inner class RecyclerListViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
@@ -48,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerListViewHolder {
             val inflater = LayoutInflater.from(this@MainActivity)
             val view = inflater.inflate(R.layout.row,parent,false)
+            view.setOnClickListener(ItemClickListener())
             return RecyclerListViewHolder(view)
             //return holder
         }
@@ -66,7 +73,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    private inner class ItemClickListener:View.OnClickListener{
+        override fun onClick(view: View) {
+            val tvMenuName = view.findViewById<TextView>(R.id.tvMenuNameRow)
+            val menuName = tvMenuName.text.toString()
+            val msg = getString(R.string.msg_header)+menuName
+            Toast.makeText(this@MainActivity,msg,Toast.LENGTH_SHORT).show()
+        }
+    }
 
     private fun createTeishokuList(): MutableList<MutableMap<String, Any>> {
 
