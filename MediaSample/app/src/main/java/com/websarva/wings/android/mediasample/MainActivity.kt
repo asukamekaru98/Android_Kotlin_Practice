@@ -70,4 +70,17 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    fun onBackButtonClick(view: View){
+        _player?.seekTo(0)
+    }
+
+    fun onForwardButtonClock(view: View){
+        _player?.let{
+            val duration = it.duration
+            it.seekTo(duration)
+            if(!it.isPlaying){
+                it.start()
+            }
+        }
+    }
 }
