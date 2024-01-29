@@ -1,12 +1,15 @@
 package com.websarva.wings.android.implicitintentsample
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -56,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private inner class OnUpdateLocation: LocationCallback(){
-        override fun onLocationResult(locationResult: LocationResult?) {
+        override fun onLocationResult(locationResult: LocationResult) {
            locationResult?.let {
                val location = it.lastLocation
                location?.let {
@@ -72,6 +75,13 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onResume(){
         super.onResume()
+
+        //ACCESS_FINE_LOCATIONの許可が降りていないなら
+        if (ActivityCompat.checkSelfPermission(this@MainActivity,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+           val premissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            ActivityCompat.requestPermissions(this@MainActivity,premissions,1000)
+            return
+        }
         _fusedLocationClient.requestLocationUpdates(_locationRequest, _onUpdateLocation, mainLooper)
     }
 
@@ -80,5 +90,12 @@ class MainActivity : AppCompatActivity() {
         _fusedLocationClient.removeLocationUpdates(_onUpdateLocation)
     }
 
-
+    override fun onRequestPermissionsResult(requestCode: Int,permissions:Array<String>,grantResult:IntArray){
+        if(requestCode == 1000 && grantResult[0] == PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.checkSelfPermission(this@MainActivity,Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                return
+            }
+            _fusedLocationClient.requestLocationUpdates(_locationRequest,_onUpdateLocation,mainLooper)
+        }
+    }
 }
