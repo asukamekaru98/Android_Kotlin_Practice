@@ -1,21 +1,30 @@
 package com.webserva.wings.android.ui_practice
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
 
 class MainActivity : AppCompatActivity() {
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(findViewById(R.id.my_toolbar))  //ツールバー呼び出し
 
-        val lvMenu = findViewById<ListView>(R.id.lvMenu)
+        val lvMenu = findViewById<ListView>(R.id.lvItems)
+        lvMenu.setBackgroundResource(R.drawable.list_item)
+
+
         val menuList: MutableList<MutableMap<String, String>> = mutableListOf()
 
         var product1 :String = "唐揚げ定食"
@@ -37,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         lvMenu.onItemClickListener = ListItemClickListener()
     }
 
-    /*  ボタンクリック動作 */
+    /*  リストのボタンが押されたとき呼び出される関数 */
     private inner class ListItemClickListener : AdapterView.OnItemClickListener{
         override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long){
             val item = parent.getItemAtPosition(position) as MutableMap<String,String>
@@ -54,4 +63,5 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
+
 }
