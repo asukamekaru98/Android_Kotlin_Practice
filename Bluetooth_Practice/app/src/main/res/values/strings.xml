@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Bluetooth_Practice</string>
+    <string name="txt_bluetoothAddress">Bluetoothアドレス</string>
+    <string name="txt_bluetoothStatus">BluetoothStatus</string>
+    <string name="txt_sendValue">送信値</string>
+    <string name="txt_send">送信</string>
 </resources>
