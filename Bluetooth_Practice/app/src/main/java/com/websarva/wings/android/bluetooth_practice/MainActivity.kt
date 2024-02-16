@@ -18,7 +18,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.bluetooth_practice.Constants.PREF_INPUT_VALUES
 import java.io.IOException
-import java.util.Timer
 import java.util.TimerTask
 import java.util.UUID
 
@@ -26,9 +25,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val REQUEST_BLUETOOTH_CONNECT = 100
         private val MY_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-        //private const val DEVICE_ADDRESS = "58:11:22:D7:81:C3"  // Python側(PC)のMACアドレスを記入しましょう！
-        // private const val DEVICE_ADDRESS = "00:A5:54:C2:D7:96" //デスクトップPC
-        private const val DEVICE_ADDRESS = "D8:80:39:F6:01:AF" //プリンタ
     }
 
     private var bluetoothAdapter: BluetoothAdapter? = null
@@ -55,22 +51,29 @@ class MainActivity : AppCompatActivity() {
 
         // getString()を呼び出して保存されている文字列を読み込む
         // まだ保存されていない場合はデフォルトの文字列を返す
-        val savedEditTextBtText = sharedPref.getString(Constants.KEY_BT_ADRS, Constants.TXT_DEF_BT_ADRS)
+        var savedEditTextBtText = sharedPref.getString(Constants.KEY_BT_ADRS, Constants.TXT_DEF_BT_ADRS)
         val savedEditTextSendValText = sharedPref.getString(Constants.KEY_SEND_VAL, Constants.TXT_DEF_BLANK)
 
 
+        if(savedEditTextBtText == ""){
+            Log.d("TAG", "sEditTextBtText is true = $savedEditTextBtText")
+            //etBluetoothAdrs.setText(Constants.TXT_DEF_BT_ADRS)    //テキスト設定 (Bluetoothアドレス EditText)
+            savedEditTextBtText = Constants.TXT_DEF_BT_ADRS    //テキスト設定 (Bluetoothアドレス EditText)
+        }else{
+            Log.d("TAG", "sEditTextBtText is false = $savedEditTextBtText")
+        }
+
+        Log.d("TAG", "savedEditTextBtText = $savedEditTextBtText")
 
         etBluetoothAdrs.setText(savedEditTextBtText)    //テキスト設定 (Bluetoothアドレス EditText)
+        etBluetoothAdrs.requestFocus()                  // フォーカスを設定
+
         etSendValue.setText(savedEditTextSendValText)   //テキスト設定 (送信値 EditText)
 
         btAdrsBtn.setOnClickListener {
             // テキストボックスに入力されている文字列を取得
             sEditTextBtText = etBluetoothAdrs.text.toString()
             sEditTextSendText = etSendValue.text.toString()
-
-            if(sEditTextBtText == ""){
-                sEditTextBtText = Constants.TXT_DEF_BT_ADRS
-            }
 
             // プリファレンスに書き込む
             sharedPref.edit().putString(Constants.KEY_BT_ADRS, sEditTextBtText).apply()
@@ -92,12 +95,6 @@ class MainActivity : AppCompatActivity() {
         //requestBluetoothPermissions()
     }
 
-
-
-
-
-
-
     private fun requestBluetoothPermissions() {
 
         Log.d("TAG", "requestBluetoothPermissionsに入る")
@@ -108,7 +105,6 @@ class MainActivity : AppCompatActivity() {
                 Manifest.permission.BLUETOOTH
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d("TAG", "if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ContextCompat.checkSelfPermission(に入る")
 
             ActivityCompat.requestPermissions(
                 this,
@@ -117,102 +113,65 @@ class MainActivity : AppCompatActivity() {
                 REQUEST_BLUETOOTH_CONNECT
             )
         } else {
-            Log.d("TAG", "setupBluetoothConnection()の手前")
             setupBluetoothConnection()
         }
     }
 
+    /*
     private fun setupBluetoothConnection() {
 
-        Log.d("TAG", "setupBluetoothConnection()に入った")
 
-        if (ContextCompat.checkSelfPermission(
-                this,
-                /*Manifest.permission.BLUETOOTH_CONNECT*/
-                Manifest.permission.BLUETOOTH
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+
+
+
+        //Bluetoothの接続許可が与えられているか確認
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
             try {
+                // ペアリングされたBluetoothデバイスのリストを取得
                 val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
-                val device = pairedDevices?.firstOrNull { it.address == DEVICE_ADDRESS }
-                //val device = pairedDevices?.firstOrNull { it.address == sEditTextBtText }
 
-              //  Log.d("TAG", it.address.toString())
-                Log.d("TAG", device.toString())
-                Log.d("TAG", "BTアドレス$sEditTextBtText")
-                Log.d("TAG", "送信値$sEditTextSendText")
+                // 今回指定したBluetoothアドレスを持つデバイスを検索
+                val device = pairedDevices?.firstOrNull { it.address == sEditTextBtText }
 
-/*
                 device?.let {
+                    //ソケット作成
                     bluetoothSocket = it.createRfcommSocketToServiceRecord(MY_UUID)
+                    Log.d("TAG", "bluetoothSocket = $bluetoothSocket")
 
                             try {
-                                Log.d("TAG", "B")
-
+                                //ソケット接続がなければ、接続を試す
                                 if (bluetoothSocket?.isConnected == false) {
-                                    Log.d("TAG", "C")
                                     bluetoothSocket?.connect()
-                                    Log.d("TAG", "CC")
                                     isConnected = true
-                                    Log.d("TAG", "CCC")
                                 }
                                 Log.d("TAG", "D")
 
-                                val FS = 0x1c
-                                //var btStr = "x1cK21000000039830209181000007"
-
                                 //ここでデバイスに送信をしている
-                                //bluetoothSocket?.outputStream?.write("K21000000039830214201000003".toByteArray())
-                                // bluetoothSocket?.outputStream?.write(btStr.toByteArray(Charsets.UTF_8))
-                               // bluetoothSocket?.outputStream?.write(Constants.TXT_DEF_BT_ADRS.toByteArray(Charsets.UTF_8))
                                 bluetoothSocket?.outputStream?.write(sEditTextSendText.toByteArray(Charsets.UTF_8))
 
                             } catch (e: IOException) {
-                                Log.d("TAG", "E")
+                                Log.d("TAG", "IOException")
+
                                 isConnected = false
-                               // cancel()
                             }
 
                 }
-*/
 
-                device?.let {
-                    bluetoothSocket = it.createRfcommSocketToServiceRecord(MY_UUID)
+                    try {
+                        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
+                        val device = pairedDevices?.firstOrNull { it.address == sEditTextBtText }
 
-                    timerTask = object : TimerTask() {
-                        override fun run() {
-                            try {
-                                Log.d("TAG", "B")
-
-                                if (bluetoothSocket?.isConnected == false) {
-                                    Log.d("TAG", "C")
-                                    bluetoothSocket?.connect()
-                                    isConnected = true
-                                }
-                                Log.d("TAG", "D")
-
-                                val FS = 0x1c
-                                //var btStr = "x1cK21000000039830209181000007"
-
-                                //ここでデバイスに送信をしている
-                                //bluetoothSocket?.outputStream?.write("K21000000039830214201000003".toByteArray())
-                               // bluetoothSocket?.outputStream?.write(btStr.toByteArray(Charsets.UTF_8))
-                                bluetoothSocket?.outputStream?.write(sEditTextSendText.toByteArray(Charsets.UTF_8))
-                                //cancel()
-
-                            } catch (e: IOException) {
-                                Log.d("TAG", "E")
-                                isConnected = false
-                                cancel()
+                        device?.let {
+                            if (bluetoothSocket == null || bluetoothSocket?.isConnected == false) {
+                                bluetoothSocket = it.createRfcommSocketToServiceRecord(MY_UUID)
+                                bluetoothSocket?.connect()
+                                isConnected = true
                             }
+
+                            bluetoothSocket?.outputStream?.write(sEditTextSendText.toByteArray(Charsets.UTF_8))
                         }
-                    }
-                    Log.d("TAG", "てす")
-                    Timer().schedule(timerTask, 0, 1000)
-                }
 
-
-                Log.d("TAG", "まいくてす")
+                        Log.d("TAG", "Bluetooth connection setup successful")
             } catch (e: IOException) {
                 /*  Bluetoothソケットを作成できなかった時 */
                 Toast.makeText(
@@ -228,6 +187,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }catch(e:Exception){
+                //その他エラー
                 Toast.makeText(
                     this,
                     "どれでもない",
@@ -236,7 +196,58 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             /*  Bluetoothの許可が降りていない時    */
+            Toast.makeText(
+                this,
+                "Bluetooth permission is required",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
 
+
+    }
+     */
+
+    private fun setupBluetoothConnection() {
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
+                val device = pairedDevices?.firstOrNull { it.address == sEditTextBtText }
+
+                device?.let {
+                    if (bluetoothSocket == null || bluetoothSocket?.isConnected == false) {
+                        bluetoothSocket = it.createRfcommSocketToServiceRecord(MY_UUID)
+                        bluetoothSocket?.connect()
+                        isConnected = true
+                    }
+
+                    //bluetoothSocket?.outputStream?.write(sEditTextSendText.toByteArray(Charsets.UTF_8))
+                    bluetoothSocket?.outputStream?.write(sEditTextSendText.toByteArray())
+                }
+
+                Log.d("TAG", "Bluetooth connection setup successful")
+            } catch (e: IOException) {
+                Toast.makeText(
+                    this,
+                    "Could not establish Bluetooth connection",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.e("TAG", "IOException: ${e.message}")
+            } catch (e: SecurityException) {
+                Toast.makeText(
+                    this,
+                    "Bluetooth permission is required",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.e("TAG", "SecurityException: ${e.message}")
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this,
+                    "An unexpected error occurred",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.e("TAG", "Unexpected error: ${e.message}")
+            }
+        } else {
             Toast.makeText(
                 this,
                 "Bluetooth permission is required",
