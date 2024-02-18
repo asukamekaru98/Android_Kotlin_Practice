@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -6,6 +7,7 @@ plugins {
 android {
     namespace = "com.webserva.wings.android.customlistview"
     compileSdk = 34
+
 
     defaultConfig {
         applicationId = "com.webserva.wings.android.customlistview"

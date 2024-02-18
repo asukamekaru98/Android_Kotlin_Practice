@@ -1,6 +1,5 @@
 package com.webserva.wings.android.customlistview
 
-import android.R
 import android.content.Intent
 import android.os.Bundle
 import android.widget.AdapterView.OnItemClickListener
@@ -25,6 +24,7 @@ class MainActivity : AppCompatActivity() {
             R.drawable.burger,
             R.drawable.fries
         )
+
         val ingredientList = intArrayOf(
             R.string.pastaIngredients,
             R.string.maggiIngredients,
