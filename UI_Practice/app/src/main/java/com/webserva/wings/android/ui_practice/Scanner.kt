@@ -25,3 +25,4 @@ class Scanner : AppCompatActivity() {
         finish()
     }
 }
+
