@@ -14,7 +14,40 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
-    private val dataset = ArrayList<String>()
+    private val names: ArrayList<String> = arrayListOf(
+        "Bellflower", "Bougainvillea", "Cosmos", "Cosmos field",
+        "Delphinium", "Flowers", "Lotus", "Spring Flowers"
+    )
+
+    private val photos: ArrayList<Int> = arrayListOf(
+        R.drawable.ard, R.drawable.bomb,
+        R.drawable.fire, R.drawable.kyoto,
+        R.drawable.mochi, R.drawable.skull,
+        R.drawable.torii, R.drawable.trashcan
+    )
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val recyclerView = findViewById<RecyclerView>(R.id.my_recycler_view)
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        recyclerView.setHasFixedSize(true)
+
+        // use a linear layout manager
+        val rLayoutManager: RecyclerView.LayoutManager
+                = LinearLayoutManager(this)
+
+        recyclerView.layoutManager = rLayoutManager
+
+        recyclerView.adapter = MyAdapter(photos, names)
+    }
+}
+
+    /*
+     private val dataset = ArrayList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,7 +96,9 @@ class MainActivity : AppCompatActivity() {
 
         mIth.attachToRecyclerView(recyclerView)
     }
-}
+
+     */
+
 /*
 class MainActivity : AppCompatActivity() {
 

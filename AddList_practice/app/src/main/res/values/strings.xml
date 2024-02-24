@@ -1,11 +1,13 @@
 <resources>
-    <string name="app_name">ListViewSample2</string>
-    <string name="dialog_title">注文確認</string>
-    <string name="dialog_msg">選択された定食を注文します。よろしいかい？</string>
-    <string name="dialog_btn_ok">注文</string>
-    <string name="dialog_btn_ng">キャンセル</string>
-    <string name="dialog_btn_nu">問い合わせ</string>
-    <string name="dialog_ok_toast">ご注文ありがとうございます</string>
-    <string name="dialog_ng_toast">ご注文をキャンセルしました</string>
-    <string name="dialog_nu_toast">お問い合わせ内容をお知らせください</string>
+    <string name="app_name">Your App Name</string>
+    <string name="description">picture</string>
+
+    <string name="dialog_title">テスト</string>
+    <string name="dialog_msg">メッセージ</string>
+    <string name="dialog_btn_ok">OK</string>
+    <string name="dialog_btn_ng">NG</string>
+    <string name="dialog_btn_nu">NU</string>
+    <string name="dialog_ok_toast">OK</string>
+    <string name="dialog_ng_toast">NG</string>
+    <string name="dialog_nu_toast">NU</string>
 </resources>
